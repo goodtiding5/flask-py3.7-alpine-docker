@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -e
+
+# Allow system packages to be used in the virtual env
+[ -d /app/.venv ] || python3 -m venv --system-site-packages /app/.venv
+
+. /app/.venv/bin/activate
+
+# upgrade pip
+pip --no-cache-dir install -U pip
+
+[ -f /app/requirements.txt ] && pip --no-cache-dir install -r /app/requirements.txt
+
+# definitely install the right gunicorn package locally
+# 19.7.1 is the one work with alpine
+
+pip --no-cache-dir install -I gunicorn==19.7.1
+
+exit 0

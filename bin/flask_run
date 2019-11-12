@@ -1,0 +1,37 @@
+#!/bin/sh
+
+set -e
+
+FLASK_APPNAME=${FLASK_APPNAME:-"app:app"}
+FLASK_DBHOST=${FLASK_DBHOST:-"db:3306"}
+
+wait_db () {
+    case "$1" in
+	*":"*)
+	    host=`echo $1 | sed -e 's/:.*$//'`
+	    port=`echo $1 | sed -e 's/^.*://'`
+	    ;;
+
+	*)
+	    host=$1
+	    port=3306		# default mysql listening port
+	    ;;
+    esac
+
+    until nc -z -v -w30 $host $port
+    do
+	echo "Waiting for database connection..."
+	# wait for 5 seconds before check again
+	sleep 5
+    done
+}
+
+[ -d /app/.venv ] || /usr/local/bin/flask_init
+
+. /app/.venv/bin/activate
+
+wait_db $FLASK_DBHOST
+
+exec gunicorn -w 4 -b 0.0.0.0:5000 ${FLASK_APPNAME}
+
+exit 0
