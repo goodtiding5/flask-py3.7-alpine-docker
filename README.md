@@ -1,2 +1,3 @@
-# flask-py3.7-alpine-docker
-Docker for Flask with python-3.7-alpine
+# Docker image for Flask
+
+A Docker image for Python/Flask built upon python3.7 alpine image.
